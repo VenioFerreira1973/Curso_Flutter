@@ -4,7 +4,7 @@ import 'adaptative_text_field.dart';
 import 'adaptative_date_picker.dart';
 
 class TransactionForm extends StatefulWidget {
-  final void Function(String, double, DateTime?) onSubmit;
+  final void Function(String, double, DateTime) onSubmit;
 
   const TransactionForm(this.onSubmit, {Key? key}) : super(key: key);
 
@@ -25,7 +25,7 @@ class _TransactionFormState extends State<TransactionForm> {
       return;
     }
 
-    widget.onSubmit(title, value, _selectedDate);
+    widget.onSubmit(title, value, _selectedDate!);
   }
 
   @override
@@ -36,53 +36,39 @@ class _TransactionFormState extends State<TransactionForm> {
         child: Padding(
           padding: EdgeInsets.only(
             top: 10,
-            left: 10,
             right: 10,
+            left: 10,
             bottom: 10 + MediaQuery.of(context).viewInsets.bottom,
           ),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
+            children: [
               AdaptativeTextField(
                 label: 'Título',
                 controller: _titleController,
-                onSubmitted: (_) => _submitForm(),
+                onSubmitted: (_) => _submitForm,
               ),
               AdaptativeTextField(
                 label: 'Valor (R\$)',
                 controller: _valueController,
-                keyBoardType:
+                keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
-                onSubmitted: (_) => _submitForm(),
+                onSubmitted: (_) => _submitForm,
               ),
               AdaptativeDatePicker(
-                  selectedDate: _selectedDate!,
-                  onDateChanged: (newDate) {
-                    setState(() {
-                      _selectedDate = newDate;
-                    });
-                  }),
+                selectedDate: _selectedDate,
+                onDateChanged: (newDate) {
+                  setState(() {
+                    _selectedDate = newDate;
+                  });
+                },
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
                   AdaptativeButton(
-                      label: 'Nova Transação', onPressed: _submitForm),
-                  //ElevatedButton(
-                  //  onPressed: _submitForm,
-                  //  style: ElevatedButton.styleFrom(
-                  //    foregroundColor:
-                  //        Theme.of(context).textTheme.labelLarge?.color,
-                  //    backgroundColor:
-                  //        Theme.of(context).primaryColor, // Cor do texto
-                  //  ),
-                  //  child: const Text(
-                  //    'Nova Transação',
-                  //    style: TextStyle(
-                  //      fontSize: 16,
-                  //      fontWeight: FontWeight.bold,
-                  //    ),
-                  //  ),
-                  //)
+                    'Nova Transação',
+                    _submitForm,
+                  ),
                 ],
               ),
             ],

@@ -1,18 +1,17 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import 'package:intl/intl.dart';
 
 class AdaptativeDatePicker extends StatelessWidget {
-  final DateTime selectedDate;
-  final Function(DateTime) onDateChanged;
+  final DateTime? selectedDate;
+  final Function(DateTime)? onDateChanged;
 
   const AdaptativeDatePicker({
-    super.key,
-    required this.selectedDate,
-    required this.onDateChanged,
-  });
+    this.selectedDate,
+    this.onDateChanged,
+    Key? key,
+  }) : super(key: key);
 
   _showDatePicker(BuildContext context) {
     showDatePicker(
@@ -25,7 +24,7 @@ class AdaptativeDatePicker extends StatelessWidget {
         return;
       }
 
-      onDateChanged(pickedDate);
+      onDateChanged!(pickedDate);
     });
   }
 
@@ -39,31 +38,27 @@ class AdaptativeDatePicker extends StatelessWidget {
               initialDateTime: DateTime.now(),
               minimumDate: DateTime(2019),
               maximumDate: DateTime.now(),
-              onDateTimeChanged: onDateChanged,
+              onDateTimeChanged: onDateChanged!,
             ),
           )
         : SizedBox(
             height: 70,
             child: Row(
               children: <Widget>[
-                Expanded(
-                  child: Text(
-                    // ignore: unnecessary_null_comparison
-                    selectedDate == null
-                        ? 'Nenhuma data selecionada.'
-                        : 'Data selecionada: ${DateFormat('d/M/y').format(selectedDate)}',
-                  ),
+                Text(
+                  selectedDate == null
+                      ? 'Nenhuma data selecionada!'
+                      : 'Data Selecionada: ${DateFormat('dd/MM/y').format(selectedDate!)}',
                 ),
                 TextButton(
-                  onPressed: () => _showDatePicker(context),
-                  child: Text(
-                    'Selecionar data',
+                  child: const Text(
+                    'Selecionar Data',
                     style: TextStyle(
-                      color: Theme.of(context).primaryColor,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
+                  onPressed: () => _showDatePicker(context),
+                )
               ],
             ),
           );

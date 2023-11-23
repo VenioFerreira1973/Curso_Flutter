@@ -2,36 +2,40 @@ import 'dart:math';
 import 'dart:io';
 
 import 'package:expenses/components/transaction_form.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 
 import 'components/transaction_list.dart';
 import 'components/chart.dart';
 import 'models/transaction.dart';
 
-main() => runApp(const ExpensesApp());
+main() => runApp(ExpensesApp());
 
 class ExpensesApp extends StatelessWidget {
-  const ExpensesApp({Key? key}) : super(key: key);
+  ExpensesApp({Key? key}) : super(key: key);
+  final ThemeData tema = ThemeData();
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: const MyHomePage(),
-      theme: ThemeData(
-        primarySwatch: Colors.purple,
-        hintColor: Colors.amber,
-        fontFamily: 'Quicksand',
-        textTheme: ThemeData.light().textTheme.copyWith(
-            titleLarge: const TextStyle(
-              fontFamily: 'OpenSans',
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-            labelLarge: const TextStyle(
-              color: Colors.amber,
-              fontWeight: FontWeight.bold,
-            )),
+      theme: tema.copyWith(
+        colorScheme: tema.colorScheme.copyWith(
+          primary: Colors.purple,
+          secondary: Colors.amber,
+        ),
+        textTheme: tema.textTheme.copyWith(
+          headline6: const TextStyle(
+            fontFamily: 'OpenSans',
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+          button: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         appBarTheme: const AppBarTheme(
           titleTextStyle: TextStyle(
             fontFamily: 'OpenSans',
@@ -51,37 +55,24 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
+class _MyHomePageState extends State<MyHomePage> {
   final List<Transaction> _transactions = [];
   bool _showChart = false;
 
-  //@override
-  //void initState() {
-  //  super.initState();
-  //  WidgetsBinding.instance.addObserver(this);
-  //}
-
-  //@override
-  //void didChangeAppLifecycleState(AppLifecycleState state) {}
-
-  //@override
-  //void dispose() {
-  //  super.dispose();
-  //  WidgetsBinding.instance.removeObserver(this);
-  //}
-
   List<Transaction> get _recentTransactions {
     return _transactions.where((tr) {
-      return tr.date.isAfter(DateTime.now().subtract(const Duration(days: 7)));
+      return tr.date.isAfter(DateTime.now().subtract(
+        const Duration(days: 7),
+      ));
     }).toList();
   }
 
-  _addTransaction(String title, double value, DateTime? dateTime) {
+  _addTransaction(String title, double value, DateTime date) {
     final newTransaction = Transaction(
       id: Random().nextDouble().toString(),
       title: title,
       value: value,
-      date: dateTime!,
+      date: date,
     );
 
     setState(() {
@@ -93,9 +84,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   _removeTransaction(String id) {
     setState(() {
-      _transactions.removeWhere((tr) {
-        return tr.id == id;
-      });
+      _transactions.removeWhere((tr) => tr.id == id);
     });
   }
 
@@ -120,13 +109,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     bool isLandscape = mediaQuery.orientation == Orientation.landscape;
 
     final iconList = Platform.isIOS ? CupertinoIcons.refresh : Icons.list;
-    final iconChart =
+    final chartList =
         Platform.isIOS ? CupertinoIcons.refresh : Icons.show_chart;
 
-    final actions = <Widget>[
+    final actions = [
       if (isLandscape)
         _getIconButton(
-          _showChart ? iconList : iconChart,
+          _showChart ? iconList : chartList,
           () {
             setState(() {
               _showChart = !_showChart;
@@ -139,11 +128,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       ),
     ];
 
-    final appBar = AppBar(
-        title: const Text(
-          'Despesas Pessoais',
-        ),
-        actions: actions);
+    final PreferredSizeWidget appBar = AppBar(
+      title: const Text('Despesas Pessoais'),
+      actions: actions,
+    );
 
     final availableHeight = mediaQuery.size.height -
         appBar.preferredSize.height -
@@ -153,14 +141,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
+          children: [
             // if (isLandscape)
             //   Row(
             //     mainAxisAlignment: MainAxisAlignment.center,
-            //     children: <Widget>[
-            //       const Text('Exibir gráfico'),
+            //     children: [
+            //       const Text('Exibir Gráfico'),
             //       Switch.adaptive(
-            //        activeColor: Theme.of(context).accentColor,
+            //         activeColor: Theme.of(context).colorScheme.secondary,
             //         value: _showChart,
             //         onChanged: (value) {
             //           setState(() {
@@ -172,12 +160,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             //   ),
             if (_showChart || !isLandscape)
               SizedBox(
-                  height: availableHeight * (isLandscape ? 0.8 : 0.3),
-                  child: Chart(_recentTransactions)),
+                height: availableHeight * (isLandscape ? 0.8 : 0.3),
+                child: Chart(_recentTransactions),
+              ),
             if (!_showChart || !isLandscape)
               SizedBox(
-                  height: availableHeight * (isLandscape ? 1 : 0.7),
-                  child: TransactionList(_transactions, _removeTransaction)),
+                height: availableHeight * (isLandscape ? 1 : 0.7),
+                child: TransactionList(_transactions, _removeTransaction),
+              ),
           ],
         ),
       ),
@@ -200,7 +190,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             floatingActionButton: Platform.isIOS
                 ? Container()
                 : FloatingActionButton(
-                    foregroundColor: Theme.of(context).hintColor,
                     child: const Icon(Icons.add),
                     onPressed: () => _openTransactionFormModal(context),
                   ),
