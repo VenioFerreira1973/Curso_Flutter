@@ -92,6 +92,7 @@ class _MyAppState extends State<MyApp> {
           return const CategoriesScreen();
         });
       },
+	  debugShowCheckedModeBanner: false,
     );
   }
 }
